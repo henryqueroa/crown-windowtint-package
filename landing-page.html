@@ -552,9 +552,26 @@
 </footer>
 
 <script>
+  // Instagram links: on phones, open the Instagram app directly (native scheme first, ig.me web fallback).
+  // Plain <a href> keeps working on desktop and without JS.
+  (function(){
+    if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
+    function openApp(fallback){
+      var t = setTimeout(function(){ if (!document.hidden) location.href = fallback; }, 1400);
+      var cancel = function(){ clearTimeout(t); };
+      window.addEventListener('pagehide', cancel, {once:true});
+      document.addEventListener('visibilitychange', function(){ if (document.hidden) cancel(); }, {once:true});
+      location.href = 'instagram://user?username=crown_windowtint';
+    }
+    document.querySelectorAll('a[href^="https://ig.me/"], a[href="https://www.instagram.com/crown_windowtint/"]').forEach(function(a){
+      a.addEventListener('click', function(e){ e.preventDefault(); openApp(a.href); });
+    });
+    window.crownIGOpen = openApp;
+  })();
   function crownQuote(f){
     if (f.action.indexOf('PROSPECT_FORM_ENDPOINT') !== -1) {
-      window.open('https://ig.me/m/crown_windowtint', '_blank', 'noopener');
+      if (window.crownIGOpen) window.crownIGOpen('https://ig.me/m/crown_windowtint');
+      else window.open('https://ig.me/m/crown_windowtint', '_blank', 'noopener');
       return false;
     }
     return true;

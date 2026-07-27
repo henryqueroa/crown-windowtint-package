@@ -217,8 +217,27 @@
   footer .zytrom{font-size:11px;color:#565c66}
   footer .zytrom a{color:#6b7280}
 
-  .reveal{opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .5s ease}
-  .reveal.in{opacity:1;transform:none}
+  /* .reveal is animated from JS (GSAP); no CSS hiding so content stays visible without JS */
+
+  /* Hero decorative blob (MorphSVG) */
+  .hero-feature{position:relative}
+  .hero-blob{position:absolute;left:-60px;top:-40px;width:calc(100% + 120px);height:calc(100% + 80px);opacity:.1;filter:blur(42px);pointer-events:none;z-index:0}
+  .hero-card{position:relative;z-index:1}
+
+  /* Services filter tabs (Flip) */
+  .svc-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+  .svc-tab{cursor:pointer;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 14px;transition:color .15s ease,border-color .15s ease}
+  .svc-tab:hover{color:var(--text)}
+  .svc-tab.active{color:var(--gold);background:var(--gold-dim);border-color:rgba(227,179,76,.3)}
+
+  /* Builds carousel on mobile (Observer) */
+  .builds-viewport.clip{overflow:hidden;border-radius:14px}
+  .builds-grid.carousel{display:flex;gap:14px}
+  .builds-grid.carousel .build{min-width:100%}
+  .builds-dots{display:none;justify-content:center;gap:8px;margin-top:14px}
+  .builds-dots.on{display:flex}
+  .builds-dots button{width:8px;height:8px;border-radius:50%;border:0;cursor:pointer;background:var(--line);padding:0}
+  .builds-dots button.active{background:var(--gold)}
 
   @media(max-width:860px){
     section{padding:48px 0}
@@ -267,6 +286,9 @@
       <span class="chip">754 builds posted</span>
     </div>
     <div class="hero-feature">
+      <svg class="hero-blob" viewBox="0 0 600 400" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path id="heroBlob" fill="#e3b34c" d="M300,40 C420,30 560,110 555,205 C550,300 430,370 300,362 C170,370 55,300 48,205 C42,110 180,50 300,40 Z"></path>
+      </svg>
       <div class="hero-card">
         <div class="hero-photo">
           <img src="images/jeep-srt.jpg" alt="Jeep Grand Cherokee SRT with XPEL XR ceramic tint by Crown Tint & Vinyl" fetchpriority="high">
@@ -301,13 +323,19 @@
   <div class="wrap reveal">
     <div class="kicker">Services</div>
     <h2>Six ways in, one install standard</h2>
+    <div class="svc-tabs" role="tablist" aria-label="Filter services by type">
+      <button class="svc-tab active" type="button" data-lane="all">All</button>
+      <button class="svc-tab" type="button" data-lane="glass">Glass</button>
+      <button class="svc-tab" type="button" data-lane="body">Body</button>
+      <button class="svc-tab" type="button" data-lane="tech">Tech</button>
+    </div>
     <div class="svc-grid">
-      <div class="svc"><div class="lane">Glass</div><h3>Window Tinting</h3><p>XPEL XR Black Ceramic, quoted per window from 5% to 50%. Heat and UV out, privacy in, for daily drivers and performance builds across the Gilberts and Elgin area.</p></div>
-      <div class="svc"><div class="lane">Glass</div><h3>Windshield Chip Repair</h3><p>Stop a rock chip before it spiders into a replacement. Quick appointment at the Gilberts shop.</p></div>
-      <div class="svc"><div class="lane">Glass</div><h3>Taillight &amp; Headlight Tint</h3><p>Luxe Film light tinting for a cleaner front and rear signature, specced to stay road friendly.</p></div>
-      <div class="svc"><div class="lane body">Body</div><h3>Vinyl Wrap</h3><p>Full color changes and chrome delete. Recent build: GMC Sierra in Gloss Sandstorm, wrapped and detrimmed in house.</p></div>
-      <div class="svc"><div class="lane body">Body</div><h3>Ceramic Coating</h3><p>Gloss and protection layered over paint or wrap, so the finish you paid for keeps looking installed yesterday.</p></div>
-      <div class="svc"><div class="lane">Tech</div><h3>Remote Start</h3><p>Start warm in January without leaving the house. Installed clean, no dash surgery scars.</p></div>
+      <div class="svc" data-lane="glass"><div class="lane">Glass</div><h3>Window Tinting</h3><p>XPEL XR Black Ceramic, quoted per window from 5% to 50%. Heat and UV out, privacy in, for daily drivers and performance builds across the Gilberts and Elgin area.</p></div>
+      <div class="svc" data-lane="glass"><div class="lane">Glass</div><h3>Windshield Chip Repair</h3><p>Stop a rock chip before it spiders into a replacement. Quick appointment at the Gilberts shop.</p></div>
+      <div class="svc" data-lane="glass"><div class="lane">Glass</div><h3>Taillight &amp; Headlight Tint</h3><p>Luxe Film light tinting for a cleaner front and rear signature, specced to stay road friendly.</p></div>
+      <div class="svc" data-lane="body"><div class="lane body">Body</div><h3>Vinyl Wrap</h3><p>Full color changes and chrome delete. Recent build: GMC Sierra in Gloss Sandstorm, wrapped and detrimmed in house.</p></div>
+      <div class="svc" data-lane="body"><div class="lane body">Body</div><h3>Ceramic Coating</h3><p>Gloss and protection layered over paint or wrap, so the finish you paid for keeps looking installed yesterday.</p></div>
+      <div class="svc" data-lane="tech"><div class="lane">Tech</div><h3>Remote Start</h3><p>Start warm in January without leaving the house. Installed clean, no dash surgery scars.</p></div>
     </div>
   </div>
 </section>
@@ -346,6 +374,7 @@
   <div class="wrap reveal">
     <div class="kicker">Recent builds</div>
     <h2>Real cars, exact specs</h2>
+    <div class="builds-viewport">
     <div class="builds-grid">
       <a class="build" href="https://www.instagram.com/p/DYN7ZDbESgo/" target="_blank" rel="noopener"><span class="tag">Performance</span><img src="images/jeep-srt.jpg" alt="Jeep SRT tinted with XPEL XR"><div class="meta"><div class="car">Jeep SRT</div><div class="bspec">5% SIDES &amp; REAR · 15% WINDSHIELD · XPEL XR</div></div></a>
       <a class="build" href="https://www.instagram.com/p/DarDDqfkTnA/" target="_blank" rel="noopener"><span class="tag daily">Daily</span><img src="images/bmw-ix.jpg" alt="2027 BMW iX ceramic tint"><div class="meta"><div class="car">2027 BMW iX</div><div class="bspec">15% SIDES &amp; REAR · 50% WINDSHIELD · XPEL XR</div></div></a>
@@ -354,6 +383,8 @@
       <a class="build" href="https://www.instagram.com/p/DYqC6oUj7sA/" target="_blank" rel="noopener"><span class="tag daily">Daily</span><img src="images/kia-k4.jpg" alt="2025 Kia K4 tint"><div class="meta"><div class="car">2025 Kia K4</div><div class="bspec">20% SIDES · 5% REAR · XPEL XR</div></div></a>
       <a class="build" href="https://www.instagram.com/p/DYIxiR_kZ9H/" target="_blank" rel="noopener"><span class="tag">Wrap</span><img src="images/gmc-sierra-wrap.jpg" alt="GMC Sierra Gloss Sandstorm wrap"><div class="meta"><div class="car">GMC Sierra</div><div class="bspec">GLOSS SANDSTORM WRAP · CHROME DELETE</div></div></a>
     </div>
+    </div>
+    <div class="builds-dots" aria-label="Build slides"></div>
     <p class="builds-note">Every card links to the original post. The full archive lives at <a href="https://www.instagram.com/crown_windowtint/" target="_blank" rel="noopener">@crown_windowtint</a>.</p>
   </div>
 </section>
@@ -519,8 +550,6 @@
 </footer>
 
 <script>
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   function crownQuote(f){
     if (f.action.indexOf('PROSPECT_FORM_ENDPOINT') !== -1) {
       window.open('https://ig.me/m/crown_windowtint', '_blank', 'noopener');
@@ -528,6 +557,121 @@
     }
     return true;
   }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Flip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Observer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/MorphSVGPlugin.min.js"></script>
+<script>
+(function(){
+  var hasGsap = typeof window.gsap !== 'undefined';
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var animate = hasGsap && !reduced;
+  if (hasGsap) gsap.registerPlugin(ScrollTrigger, SplitText, Flip, Observer, MorphSVGPlugin);
+
+  // Services filter: works with or without animation (Flip only enhances)
+  var svcTabs = document.querySelectorAll('.svc-tab');
+  var svcCards = Array.prototype.slice.call(document.querySelectorAll('.svc'));
+  svcTabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      svcTabs.forEach(function(t){ t.classList.toggle('active', t === tab); });
+      var lane = tab.dataset.lane;
+      var keep = function(c){ return lane === 'all' || c.dataset.lane === lane; };
+      if (!animate) {
+        svcCards.forEach(function(c){ c.style.display = keep(c) ? '' : 'none'; });
+        return;
+      }
+      // Deterministic two-phase filter: fade out leavers, then Flip-reflow survivors + fade in enterers.
+      var toHide = svcCards.filter(function(c){ return c.style.display !== 'none' && !keep(c); });
+      var toShow = svcCards.filter(function(c){ return c.style.display === 'none' && keep(c); });
+      var finish = function(){
+        var survivors = svcCards.filter(function(c){ return c.style.display !== 'none' && keep(c); });
+        var state = Flip.getState(survivors);
+        toHide.forEach(function(c){ c.style.display = 'none'; gsap.set(c, {clearProps:'opacity,scale,transform'}); });
+        toShow.forEach(function(c){ c.style.display = ''; gsap.set(c, {opacity:0, scale:.96}); });
+        Flip.from(state, {duration:.4, ease:'power1.inOut'});
+        if (toShow.length) gsap.to(toShow, {opacity:1, scale:1, duration:.35, delay:.1, stagger:.04,
+          onComplete: function(){ gsap.set(toShow, {clearProps:'opacity,scale,transform'}); }});
+      };
+      if (toHide.length) gsap.to(toHide, {opacity:0, scale:.96, duration:.2, onComplete: finish});
+      else finish();
+    });
+  });
+
+  if (!animate) return;
+
+  // Scroll-reveal via ScrollTrigger (content visible by default; JS animates it in)
+  gsap.utils.toArray('.reveal').forEach(function(el){
+    gsap.from(el, {opacity:0, y:18, duration:.6, ease:'power2.out',
+      scrollTrigger:{trigger:el, start:'top 88%', once:true}});
+  });
+
+  // Hero entrance: h1 word by word (SplitText), then supporting elements
+  var split = new SplitText('.hero h1', {type:'words'});
+  gsap.from(split.words, {opacity:0, y:14, duration:.5, ease:'power2.out', stagger:.06});
+  gsap.from(['.hero p.sub', '.hero .trust-row', '.hero-card', '.hero .cta-row'],
+    {opacity:0, y:12, duration:.5, ease:'power2.out', stagger:.08, delay:.2});
+
+  // Decorative blob morph (MorphSVG), slow loop in Crown gold
+  var blobB = 'M300,55 C400,20 545,90 560,195 C575,300 460,355 310,368 C160,380 70,320 45,215 C22,110 200,90 300,55 Z';
+  var blobC = 'M305,35 C445,45 540,140 548,225 C556,310 420,350 295,355 C170,360 75,285 55,190 C35,95 165,25 305,35 Z';
+  gsap.timeline({repeat:-1, yoyo:true, defaults:{ease:'sine.inOut'}})
+    .to('#heroBlob', {morphSVG: blobB, duration: 9})
+    .to('#heroBlob', {morphSVG: blobC, duration: 10});
+
+  // FAQ accordion: animate open/close with Flip
+  document.querySelectorAll('#faq details').forEach(function(det){
+    det.querySelector('summary').addEventListener('click', function(e){
+      e.preventDefault();
+      var state = Flip.getState('#faq details');
+      if (det.open) det.removeAttribute('open'); else det.setAttribute('open','');
+      Flip.from(state, {duration:.35, ease:'power1.inOut'});
+      if (det.open) gsap.from(det.querySelector('.a'), {opacity:0, y:6, duration:.3, delay:.06});
+    });
+  });
+
+  // Recent builds: swipeable carousel on mobile (Observer); desktop keeps the grid
+  var mm = gsap.matchMedia();
+  mm.add('(max-width: 640px)', function(){
+    var viewport = document.querySelector('.builds-viewport');
+    var grid = document.querySelector('.builds-grid');
+    var dotsBox = document.querySelector('.builds-dots');
+    if (!viewport || !grid || !dotsBox) return;
+    var count = grid.children.length, i = 0;
+    viewport.classList.add('clip');
+    grid.classList.add('carousel');
+    dotsBox.classList.add('on');
+    dotsBox.innerHTML = '';
+    var dots = [];
+    for (var d = 0; d < count; d++) {
+      (function(idx){
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label', 'Go to build ' + (idx + 1));
+        b.addEventListener('click', function(){ go(idx); });
+        dotsBox.appendChild(b); dots.push(b);
+      })(d);
+    }
+    function paint(){ dots.forEach(function(b, idx){ b.classList.toggle('active', idx === i); }); }
+    function go(idx){
+      i = Math.max(0, Math.min(count - 1, idx));
+      gsap.to(grid, {x: -i * (grid.clientWidth + 14), duration:.45, ease:'power2.out'});
+      paint();
+    }
+    var obs = Observer.create({target: viewport, type:'touch,pointer', lockAxis:true, tolerance:40, preventDefault:false,
+      onLeft: function(){ go(i + 1); }, onRight: function(){ go(i - 1); }});
+    paint();
+    return function(){
+      obs.kill();
+      viewport.classList.remove('clip');
+      grid.classList.remove('carousel');
+      dotsBox.classList.remove('on'); dotsBox.innerHTML = '';
+      gsap.set(grid, {clearProps:'x'});
+    };
+  });
+})();
 </script>
 </body>
 </html>

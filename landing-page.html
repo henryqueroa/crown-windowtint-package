@@ -64,6 +64,7 @@
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:smooth}
+  html,body{overflow-x:clip}
   body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
   img{max-width:100%;display:block}
   a{color:inherit}
@@ -89,7 +90,7 @@
   .btn-led{background:var(--led);color:#0c1720}
 
   /* Hero */
-  .hero{padding:56px 0 48px;background:radial-gradient(1200px 500px at 70% -10%,var(--led-dim),transparent 60%),radial-gradient(900px 400px at 10% 110%,var(--gold-dim),transparent 65%)}
+  .hero{padding:56px 0 48px;overflow:clip;background:radial-gradient(1200px 500px at 70% -10%,var(--led-dim),transparent 60%),radial-gradient(900px 400px at 10% 110%,var(--gold-dim),transparent 65%)}
   .hero .eyebrow{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin-bottom:16px}
   .hero .eyebrow .pin{color:var(--gold)}
   .hero h1{font-size:clamp(26px,4.2vw,46px);line-height:1.15;max-width:920px;text-transform:uppercase;margin-bottom:16px}
@@ -231,6 +232,7 @@
   .svc-tab.active{color:var(--gold);background:var(--gold-dim);border-color:rgba(227,179,76,.3)}
 
   /* Builds carousel on mobile (Observer) */
+  .builds-viewport{touch-action:pan-y}
   .builds-viewport.clip{overflow:hidden;border-radius:14px}
   .builds-grid.carousel{display:flex;gap:14px}
   .builds-grid.carousel .build{min-width:100%}
@@ -621,14 +623,24 @@
     .to('#heroBlob', {morphSVG: blobB, duration: 9})
     .to('#heroBlob', {morphSVG: blobC, duration: 10});
 
-  // FAQ accordion: animate open/close with Flip
+  // FAQ accordion: controlled height tween (content folds with the panel; native <details> without JS)
   document.querySelectorAll('#faq details').forEach(function(det){
+    var body = det.querySelector('.a');
     det.querySelector('summary').addEventListener('click', function(e){
       e.preventDefault();
-      var state = Flip.getState('#faq details');
-      if (det.open) det.removeAttribute('open'); else det.setAttribute('open','');
-      Flip.from(state, {duration:.35, ease:'power1.inOut'});
-      if (det.open) gsap.from(det.querySelector('.a'), {opacity:0, y:6, duration:.3, delay:.06});
+      if (gsap.isTweening(body)) return;
+      gsap.set(body, {overflow:'hidden'});
+      if (det.open) {
+        gsap.to(body, {height:0, paddingBottom:0, opacity:0, duration:.3, ease:'power2.inOut', onComplete:function(){
+          det.removeAttribute('open');
+          gsap.set(body, {clearProps:'height,paddingBottom,opacity,overflow'});
+        }});
+      } else {
+        det.setAttribute('open','');
+        gsap.from(body, {height:0, paddingBottom:0, opacity:0, duration:.35, ease:'power2.inOut', onComplete:function(){
+          gsap.set(body, {clearProps:'height,paddingBottom,overflow,opacity'});
+        }});
+      }
     });
   });
 
